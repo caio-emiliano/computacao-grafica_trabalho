@@ -2,25 +2,10 @@
 #include<stdlib.h>
 #include<math.h>
 #include<iostream>
-#include <windows.h>
 #include <GL/glut.h>
 using namespace std;
 #define pi (2*acos(0.0))
 
-double cameraHeight;
-double cameraAngle;
-int drawgrid;
-int drawaxes;
-double angle;
-
-double map_angle;
-double Block_size=40;
-double Block_distance=38,size_cube=38;
-int slices_spehere=30, stacks_spehere=30;
-int segments_cylinder=24;
-double temp=0;
-double move_pos=2;
-double ar=0;
 double car=0;
 double X=10,Y=50,Z=10;
 double leftRightMove=0;
@@ -31,44 +16,31 @@ struct point
 	double x,y,z;
 };
 
-point l,u,r,pos;
+void drawAxes(){
+  glColor3f(1.0, 1.0, 1.0);
+  glBegin(GL_LINES);
+  glVertex3f( 100,0,0);
+  glVertex3f(-100,0,0);
 
+  glVertex3f(0,-100,0);
+  glVertex3f(0, 100,0);
 
-
-
-
-
-
-void drawAxes()
-{
-	if(drawaxes==1)
-	{
-		glColor3f(1.0, 1.0, 1.0);
-		glBegin(GL_LINES);{
-			glVertex3f( 100,0,0);
-			glVertex3f(-100,0,0);
-
-			glVertex3f(0,-100,0);
-			glVertex3f(0, 100,0);
-
-			glVertex3f(0,0, 100);
-			glVertex3f(0,0,-100);
-		}glEnd();
-	}
+  glVertex3f(0,0, 100);
+  glVertex3f(0,0,-100);
+  glEnd();
 }
-void drawSquare(double a)
-{
-    glColor3f(1.0,0.0,0.0);
+
+void drawSquare(double a){
+  glColor3f(1.0,0.0,0.0);
 	glBegin(GL_QUADS);{
-		glVertex3f( a, a,0);
-		glVertex3f( a,-a,0);
-		glVertex3f(-a,-a,0);
-		glVertex3f(-a, a,0);
+  glVertex3f( a, a,0);
+  glVertex3f( a,-a,0);
+  glVertex3f(-a,-a,0);
+  glVertex3f(-a, a,0);
 	}glEnd();
 }
 
-void drawCircle(double radius,int segments)
-{
+void drawCircle(double radius,int segments){
     int i;
     struct point points[100];
     glColor3f(1.0,0.0,1.0);
@@ -90,8 +62,7 @@ void drawCircle(double radius,int segments)
     }
 }
 
-void drawRoad()
-{
+void drawRoad(){
     glPushMatrix();
     glColor3f(0.245, 0.245, 0.245);
 
@@ -108,90 +79,85 @@ void drawRoad()
     glPopMatrix();
 }
 
-void drawRoadMiddle()
-{
+void drawRoadMiddle(){
 
     glPushMatrix();
     glColor3f(1, 1, 1);
 
-      glTranslatef(0,0,3);
+    glTranslatef(0,0,3);
 
-      glBegin(GL_POLYGON);
+    glBegin(GL_POLYGON);
 
-        glVertex3f(-2,0,-30);
-        glVertex3f(2,0,-30);
+    glVertex3f(-2,0,-30);
+    glVertex3f(2,0,-30);
 
-        glVertex3f(-2,-2500,-30);
-        glVertex3f(2,-2500,-30);
+    glVertex3f(-2,-2500,-30);
+    glVertex3f(2,-2500,-30);
 
-      glEnd();
+    glEnd();
 
     glPopMatrix();
 }
 
-void drawMainCar()
-{
+void drawMainCar(){
     glPushMatrix();
     cout<<car<<endl;
-
 
     glTranslatef(leftRightMove,car,0);
     glRotatef(90,0,0,1);
 
+    /*******lower part********/
     glPushMatrix();
-    {
-        glColor3f(1,.8,3);
-        glScalef(2,1,.4);    /*******lower part********/
-         glutSolidCube(10);
-    }glPopMatrix();
+    glColor3f(1,.8,3);
+    glScalef(2,1,.4);    
+    glutSolidCube(10);
+    glPopMatrix();
 
+    /******* upper part********/
     glPushMatrix();
-    {
-        glTranslatef(0,0,3);
-        glColor3f(.67,.67,.67);   /******* upper part********/
-        glScalef(1,1,.6);
-         glutSolidCube(10);
-    }glPopMatrix();
+    glTranslatef(0,0,3);
+    glColor3f(.67,.67,.67);   
+    glScalef(1,1,.6);
+    glutSolidCube(10);
+    glPopMatrix();
 
+    /******* front wheel left part********/
     glPushMatrix();
-    {
-        glTranslatef(4,5,-2);
-        glColor3f(1,.3,8);   /******* front wheel left part********/
-        glScalef(2,.7,1);
-        glutSolidSphere(2,100,100);
-    }glPopMatrix();
+    glTranslatef(4,5,-2);
+    glColor3f(1,.3,8);   
+    glScalef(2,.7,1);
+    glutSolidSphere(2,100,100);
+    glPopMatrix();
 
-
+    /******* front wheel right part********/
     glPushMatrix();
-    {
-        glTranslatef(-4,5,-2);
-        glColor3f(1,0,1);   /******* front wheel right part********/
-        glScalef(1,.7,1);
-        glutSolidSphere(2,100,100);
-    }glPopMatrix();
+    glTranslatef(-4,5,-2);
+    glColor3f(1,0,1);   
+    glScalef(1,.7,1);
+    glutSolidSphere(2,100,100);
+    glPopMatrix();
 
+    /******* behind wheel left part********/
     glPushMatrix();
-    {
-        glTranslatef(4,-5,-2);
-        glColor3f(1,.6,8);   /******* behind wheel left part********/
-        glScalef(1,.7,1);
-        glutSolidSphere(2,100,100);
-    }glPopMatrix();
+    glTranslatef(4,-5,-2);
+    glColor3f(1,.6,8);   
+    glScalef(1,.7,1);
+    glutSolidSphere(2,100,100);
+    glPopMatrix();
 
-
+    /******* behind wheel right part********/
     glPushMatrix();
-    {
-        glTranslatef(-4,-5,-2);
-        glColor3f(1,.3,8);   /******* behind wheel right part********/
-        glScalef(1,.7,1);
-        glutSolidSphere(2,100,100);
-    }glPopMatrix();
+    glTranslatef(-4,-5,-2);
+    glColor3f(1,.3,8);   
+    glScalef(1,.7,1);
+    glutSolidSphere(2,100,100);
+    glPopMatrix();
 
     glPopMatrix();
+
 }
 
-void drawBackground()
-{
+void drawBackground(){
     glPushMatrix();
     glTranslatef(0,sky,500);
     glRotatef(90,0,0,1);
@@ -204,8 +170,8 @@ void drawBackground()
 
 }
 
-void drawHill()
-{
+void drawHill(){
+
     glPushMatrix();
     glTranslatef(500,sky+30,0);
     glRotatef(90,0,0,1);
@@ -226,11 +192,6 @@ void drawHill()
     glColor3f(0,0.9,0.5);
     glutSolidCone(200,400,20,20);
     glPopMatrix();
-
-}
-
-void drawTent()
-{
 
 }
 
@@ -346,10 +307,6 @@ void display(){
                glRotatef(90,1,0,0);
                glutSolidCube(50);
             }glPopMatrix();
-
-
-
-
 
             glPushMatrix();
             {
@@ -626,39 +583,13 @@ void display(){
 	glutSwapBuffers();
 }
 
-
 void animate(){
-	angle+=0.05;
 	//codes for any changes in Models, Camera
 	glutPostRedisplay();
 }
+
 void init(){
 	//codes for initialization
-	drawgrid=0;
-	drawaxes=1;
-	cameraHeight=150.0;
-	cameraAngle=1.0;
-	angle=0;
-
-	u.x=0;
-    u.y=0;
-    u.z=1;
-
-
-    r.x=-1/sqrt(2);
-    r.y=1/sqrt(2);
-    r.z=0;
-
-    l.x=-1/sqrt(2) ;
-    l.y=-1/sqrt(2) ;
-    l.z=0;
-
-    pos.x=100;
-    pos.y=100;
-    pos.z=0;
-
-
-	map_angle=90;
 
 	//clear the screen
 	glClearColor(0,0,0,0);
@@ -676,92 +607,53 @@ void init(){
 	gluPerspective(80,	1,	1,	30000.0);
 	//field of view in the Y (vertically)
 	//aspect ratio that determines the field of view in the X direction (horizontally)
-	//near distance
-	//far distance
+
 }
+
 void specialKeyListener(int key, int x,int y){
+
 	switch(key){
-		case GLUT_KEY_DOWN:		//down arrow key
-			//cameraHeight -= 3.0;
+
+		case GLUT_KEY_UP:		//down arrow key
+			
 			car-=10;
 			Y-=10;
 			X-=5;
-            sky-=10;
-			if(Y==-10000){
-                Y=50;car=0;sky=-1000;
-			}
-			pos.x-=l.x*move_pos;
-			pos.y-=l.y*move_pos;
-			pos.z-=l.z*move_pos;
+      sky-=10;
+			
+      if(Y==-10000){
+        Y=50;car=0;sky=-1000;
+		  }
 
 			break;
-		case GLUT_KEY_UP:		// up arrow key
-			//cameraHeight += 3.0;
+		
+    case GLUT_KEY_DOWN:		// up arrow key
+			
 			car+=5;
 			Y+=5;
 			X+=5;
-			pos.x+=l.x*move_pos;
-			pos.y+=l.y*move_pos;
-			pos.z+=l.z*move_pos;
+
 			break;
 
-		case GLUT_KEY_RIGHT:
-		    if(leftRightMove>0)
-		    {
-               leftRightMove+=5;
-		       car+=5;
-			   Y+=5;
-		    }
-			cameraAngle += 0.03;
-			pos.x+=r.x*move_pos;
-			pos.y+=r.y*move_pos;
-			pos.z+=r.z*move_pos;
-			break;
 		case GLUT_KEY_LEFT:
-		    leftRightMove-=5;
-		    car-=5;
+
+      leftRightMove+=5;
+      car+=5;
+      Y+=5;
+			
+			break;
+		
+    case GLUT_KEY_RIGHT:
+
+		  leftRightMove-=5;
+		  car-=5;
 			Y-=5;
-			cameraAngle -= 0.03;
-			pos.x-=r.x*move_pos;
-			pos.y-=r.y*move_pos;
-			pos.z-=r.z*move_pos;
 
 			break;
 
-		case GLUT_KEY_PAGE_UP:
-		    pos.x+=u.x*move_pos;
-			pos.y+=u.y*move_pos;
-			pos.z+=u.z*move_pos;
-			break;
-		case GLUT_KEY_PAGE_DOWN:
-            pos.x-=u.x*move_pos;
-			pos.y-=u.y*move_pos;
-			pos.z-=u.z*move_pos;
-			break;
-
-		case GLUT_KEY_INSERT:
-			break;
-
-		case GLUT_KEY_HOME:
-		    if(Block_size>0)
-            {
-                Block_size-=5;
-                temp+=5;
-            }
-			break;
-		case GLUT_KEY_END:
-            if(Block_size<size_cube)
-            {
-                Block_size+=5;
-                temp-=5;
-            }
-			break;
-
-		default:
-			break;
 	}
-}
 
+}
 
 int main(int argc, char **argv){
 	glutInit(&argc,argv);
@@ -778,12 +670,10 @@ int main(int argc, char **argv){
 	glutDisplayFunc(display);	//display callback function
 	glutIdleFunc(animate);		//what you want to do in the idle time (when no drawing is occuring)
 
-//	glutKeyboardFunc(keyboardListener);
 	glutSpecialFunc(specialKeyListener);
-	//glutMouseFunc(mouseListener);
-
 
 	glutMainLoop();		//The main loop of OpenGL
 
 	return 0;
+
 }
