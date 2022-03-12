@@ -4,6 +4,7 @@
 #include<iostream>
 #include <GL/glut.h>
 #include <vector>
+#include <string>
 using namespace std;
 #define pi (2*acos(0.0))
 
@@ -12,6 +13,10 @@ using namespace std;
 
 // OBJ_Loader - .obj Loader
 #include "OBJ_Loader.h"
+
+#define TREE_TRUNK 0
+#define LEAFS 1
+
 
 double car=0;
 double X=10,Y=50,Z=10;
@@ -22,49 +27,50 @@ struct car_meshs{
   objl::Mesh cur_mesh;
 };
 
+struct tree_meshs{
+  objl::Mesh cur_mesh;
+};
+
 struct point{
 	double x,y,z;
 };
 
-//objl::Mesh curMesh;
-
 vector<car_meshs> carro;
+vector<tree_meshs> arvore;
 
-void load_obj(char* PathToOBJ){
+void load_obj(string PathToOBJ, string OBJ_name){
 
   objl::Loader Loader;  
-
-  car_meshs Mesh;
 
 	// Load .obj File
 	bool loadout = Loader.LoadFile(PathToOBJ);
 
   if (loadout){
 
-    for (int i = 0; i < Loader.LoadedMeshes.size(); i++){
-      //curMesh = Loader.LoadedMeshes[i];
-      Mesh.cur_mesh = Loader.LoadedMeshes[i];
-      carro.push_back(Mesh);
+    if(OBJ_name == "Car"){
+
+      car_meshs Mesh;
+
+      for (int i = 0; i < Loader.LoadedMeshes.size(); i++){
+        Mesh.cur_mesh = Loader.LoadedMeshes[i];
+        carro.push_back(Mesh);
+      }
+
     }
-    
-    //std::cout << Mesh.cur_mesh.MeshName << "\n";
+
+    if(OBJ_name == "Tree"){
+
+      tree_meshs Mesh;
+      
+      for (int i = 0; i < Loader.LoadedMeshes.size(); i++){
+        Mesh.cur_mesh = Loader.LoadedMeshes[i];
+        arvore.push_back(Mesh);
+      }
+
+    }
 
   }
 
-}
-
-void drawAxes(){
-  glColor3f(1.0, 1.0, 1.0);
-  glBegin(GL_LINES);
-  glVertex3f( 100,0,0);
-  glVertex3f(-100,0,0);
-
-  glVertex3f(0,-100,0);
-  glVertex3f(0, 100,0);
-
-  glVertex3f(0,0, 100);
-  glVertex3f(0,0,-100);
-  glEnd();
 }
 
 void drawSquare(double a){
@@ -77,39 +83,18 @@ void drawSquare(double a){
 	}glEnd();
 }
 
-void drawCircle(double radius,int segments){
-    int i;
-    struct point points[100];
-    glColor3f(1.0,0.0,1.0);
-    //generate points
-    for(i=0;i<=segments;i++)
-    {
-        points[i].x=radius*cos(((double)i/(double)segments)*2*pi);
-        points[i].y=radius*sin(((double)i/(double)segments)*2*pi);
-    }
-    //draw segments using generated points
-    for(i=0;i<segments;i++)
-    {
-        glBegin(GL_LINES);
-        {
-			glVertex3f(points[i].x,points[i].y,0);
-			glVertex3f(points[i+1].x,points[i+1].y,0);
-        }
-        glEnd();
-    }
-}
-
 void drawRoad(){
+
     glPushMatrix();
     glColor3f(0.245, 0.245, 0.245);
 
     glBegin(GL_POLYGON);
 
-    glVertex3f(100,0,-30);
-    glVertex3f(-100,0,-30);
+    glVertex3f(100,5000,-30);
+    glVertex3f(-100,5000,-30);
 
-    glVertex3f(-100,-2500,-30);
-    glVertex3f(100,-2500,-30);
+    glVertex3f(-100,-5000,-30);
+    glVertex3f(100,-5000,-30);
 
     glEnd();
 
@@ -232,30 +217,54 @@ void drawHill(){
 
 }
 
-void drawOBJ(){
+void drawClouds(){
+
+    glPushMatrix();
+
+    glBegin(GL_QUADS);
+    glVertex2f(500.0f, 700.0f); // top left
+    glVertex2f(1.0f, 1.0f); // top right 
+    glVertex2f(1.0f, -1.0f); // bottom right
+    glVertex2f(-1.0f, -1.0f); // bottom left
+    glEnd();
+
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-500,sky+30,0);
+    glRotatef(90,0,0,1);
+    glColor3f(0,0.9,0.5);
+    glutSolidCone(200,400,20,20);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-700,sky+30,0);
+    glRotatef(90,0,0,1);
+    glColor3f(0,0.9,0.5);
+    glutSolidCone(200,400,20,20);
+    glPopMatrix();
+
+}
+
+void drawCarOBJ(){
 
   glPushMatrix();
  
   // Render a color-cube consisting of 6 quads with different colors
 
   glTranslatef(leftRightMove,car,0);
-  glRotatef(90,0,0,1);
-  glColor3f(0,0,0);
+  glRotatef(90,1,0,0);
 
-  glBegin(GL_POINTS);
+  glBegin(GL_POLYGON);
+
+  glColor3f(0, 0, 0);
 
   for (int i = 0; i < carro.size() ; i++){
-
-    //glPushMatrix();
-    glScalef(0.01f, 0.01f, 0.01f);
-    glColor3f(0,0,0);
   
     for (int j = 0; j < carro[i].cur_mesh.Vertices.size(); j++){
       glVertex3f(carro[i].cur_mesh.Vertices[j].Position.X, carro[i].cur_mesh.Vertices[j].Position.Y, carro[i].cur_mesh.Vertices[j].Position.Z);
       glNormal3f(carro[i].cur_mesh.Vertices[j].Normal.X, carro[i].cur_mesh.Vertices[j].Normal.Y, carro[i].cur_mesh.Vertices[j].Normal.Z);
     }
-
-    //glPopMatrix();
 
   }
 
@@ -263,7 +272,39 @@ void drawOBJ(){
 
   glPopMatrix();
 
-  //glFlush();
+}
+
+void drawTreeOBJ(int x, int y){
+
+  glPushMatrix();
+ 
+  // Render a color-cube consisting of 6 quads with different colors
+
+  glTranslatef(x,-y,0);
+  glRotatef(90,1,0,0);
+
+  glBegin(GL_POLYGON);
+
+  for (int i = 0; i < arvore.size() ; i++){
+
+    //Colorindo as partes da árvore
+    if(i == LEAFS){
+      glColor3f(34.0 / 255, 139.0 / 255 ,34.0 / 255); //Green RGB Color
+    }
+    else if(i == TREE_TRUNK){
+      glColor3f(139.0 / 255, 69.0 / 255, 19.0/ 255); //Brown RGB Color
+    }
+  
+    for (int j = 0; j < arvore[i].cur_mesh.Vertices.size(); j++){
+      glVertex3f(arvore[i].cur_mesh.Vertices[j].Position.X, arvore[i].cur_mesh.Vertices[j].Position.Y, arvore[i].cur_mesh.Vertices[j].Position.Z);
+      glNormal3f(arvore[i].cur_mesh.Vertices[j].Normal.X, arvore[i].cur_mesh.Vertices[j].Normal.Y, arvore[i].cur_mesh.Vertices[j].Normal.Z);
+    }
+
+  }
+
+  glEnd();
+
+  glPopMatrix();
 
 }
 
@@ -283,360 +324,40 @@ void display(){
 	//initialize the matrix
 	glLoadIdentity();
 
-	//now give three info
+	//again select MODEL-VIEW
+	glMatrixMode(GL_MODELVIEW);
+
+  //now give three info
 	//1. where is the camera (viewer)?
 	//2. where is the camera looking?
 	//3. Which direction is the camera's UP direction?
 
 	gluLookAt(0,Y,10,	0,-30000,0,	0,0,1);
-	//gluLookAt(60*cos(cameraAngle), 60*sin(cameraAngle), 0,		0,0,0,		0,0,1);
-	//gluLookAt(0,0,200,	0,0,0,	0,1,0);
-	//gluLookAt(pos.x, pos.y, pos.z,     pos.x + l.x,pos.y + l.y, pos.z + l.z,     u.x, u.y, u.z);
-
-
-	//again select MODEL-VIEW
-	glMatrixMode(GL_MODELVIEW);
-
 
 	/****************************
 	/ Add your objects from here
 	****************************/
 	//add objects
-    car-=.5;
-    Y-=.5;
-    sky-=.5;
+  car-=.5;
+  Y-=.5;
+  sky-=.5;
 
-    // if(abs(car)<=1500){
-    //     for(int i=0,j=0;i<=10;i++,j+=200){
+  for(int i=0,j=0;i<=30;i++,j+=100){
+      drawTreeOBJ(-35, j);
+  }
 
-    //         if(i<=5){
+  for(int i=0,j=0;i<=30;i++,j+=100){
+      drawTreeOBJ(35, j);
+  }
 
-    //           glPushMatrix();
-    //           glTranslatef(-120,-j,0);
-    //           glPushMatrix();
-    //           glTranslatef(0,0,0);
-    //           glColor3f(.6,.6,.6);
-    //           glRotatef(90,1,0,0);
-    //           glutSolidCube(50);
-    //           glPopMatrix();
+  drawCarOBJ();
 
-    //           glPushMatrix();
+  drawRoad();
+  drawRoadMiddle();
 
-    //           glTranslatef(0,0,20);
-    //           glColor3f(.6,.6,0);
-    //           glutSolidCone(40,30,30,40);
-             
-    //           glPopMatrix();
+  drawBackground();
 
-    //           glPopMatrix();
-        
-    //       }
-
-    //       else{
-
-    //         glPushMatrix();
-    //         glTranslatef(-120,-j,0);
-    //         glPushMatrix();
-    //         glColor3f(0,1,0);
-    //         glutSolidCone(20,30,20,20);
-
-    //         glPopMatrix();
-
-    //         glPushMatrix();
-    //         glColor3f(.5,.5,.3);
-    //         glScalef(.01,.4,5);
-    //         glutSolidSphere(7,10,10);
-
-    //         glPopMatrix();
-
-    //         glPopMatrix();
-          
-    //       }
-      
-    //   }
-
-    //    for(int i=0,j=0;i<=10;i++,j+=200){
-    //         if(i<=4){
-
-
-    //              glPushMatrix();
-    //             {
-    //                 glColor3f(.345,.78,0);
-    //                glTranslatef(80,-j,-15);
-    //                glTranslatef(0,55,0);
-    //                glutSolidSphere(9,5,5);
-    //              }glPopMatrix();
-
-    //         glPushMatrix();
-    //         glTranslatef(120,-j,0);
-    //         glPushMatrix();
-    //         {
-    //            glTranslatef(0,0,0);
-    //            glColor3f(.6,.6,.6);
-    //            glRotatef(90,1,0,0);
-    //            glutSolidCube(50);
-    //         }glPopMatrix();
-
-    //         glPushMatrix();
-    //         {
-    //            glTranslatef(0,0,20);
-    //            glColor3f(1,.6,0);
-    //           //glRotatef(90,1,0,0);
-    //           glutSolidCone(40,30,30,40);
-    //          }glPopMatrix();
-
-    //           glPopMatrix();
-    //         }
-    //         else if(i==5)
-    //         {
-    //             glPushMatrix();
-
-    //             glTranslatef(120,-j,0);
-
-    //             glPushMatrix();
-    //             glColor3f(.5,.5,.3);
-    //             glScalef(.01,.4,5);
-    //             glutSolidSphere(7,10,10);
-    //             glPopMatrix();
-
-    //             glPushMatrix();
-    //             glTranslatef(5,0,1);
-    //             glColor3f(0,.5,.3);
-    //             glutSolidSphere(10,10,10);
-    //             glPopMatrix();
-
-    //             glPushMatrix();
-    //             glTranslatef(-5,0,1);
-    //             glColor3f(0,.5,.3);
-    //             glutSolidSphere(10,10,10);
-    //             glPopMatrix();
-
-    //             glPushMatrix();
-    //             glTranslatef(0,0,20);
-    //             glColor3f(0,.5,.2);
-    //             glutSolidSphere(15,10,10);
-    //             glPopMatrix();
-
-    // glPopMatrix();
-    //         }
-    //         else{
-    //             glPushMatrix();
-    //          glTranslatef(120,-j,0);
-    //          glPushMatrix();
-    //          glColor3f(0,1,0);
-    //          glutSolidCone(20,30,20,20);
-
-    //          glPopMatrix();
-
-    //          glPushMatrix();
-    //          glColor3f(.5,.5,.3);
-    //          glScalef(.01,.4,5);
-    //          glutSolidSphere(7,10,10);
-
-    //          glPopMatrix();
-
-    //          glPopMatrix();
-    //         }
-    // }
-
-
-
-
-    // drawRoad();
-
-    // drawRoadMiddle();
-
-    // }
-    // else if(abs(car)<=2000)
-    // {
-    //     cout<<"problem\n";;
-    //     for(int i=0,j=0;i<=15;i++,j+=200){
-
-    //          glPushMatrix();
-    //          glTranslatef(-120,-j,0);
-    //          glPushMatrix();
-    //          glColor3f(0,1,0);
-    //          glutSolidCone(20,30,20,20);
-
-    //          glPopMatrix();
-
-    //          glPushMatrix();
-    //          glColor3f(.5,.5,.3);
-    //          glScalef(.01,.4,5);
-    //          glutSolidSphere(7,10,10);
-
-    //          glPopMatrix();
-
-    //          glPopMatrix();
-    //         }
-
-    //    for(int i=0,j=0;i<=15;i++,j+=200){
-    //         glPushMatrix();
-    //         glTranslatef(120,-j,0);
-    //         glPushMatrix();
-    //         {
-    //            glTranslatef(0,0,0);
-    //            glColor3f(.6,.6,.6);
-    //            glRotatef(90,1,0,0);
-    //            glutSolidCube(50);
-    //         }glPopMatrix();
-
-
-
-    //         glPushMatrix();
-    //         {
-    //            glTranslatef(0,0,20);
-    //            glColor3f(1,.6,0);
-    //           //glRotatef(90,1,0,0);
-    //           glutSolidCone(40,30,30,40);
-    //          }glPopMatrix();
-
-    //           glPopMatrix();
-    //     }
-
-    // glPushMatrix();
-    // glColor3f(1, 1, 1);
-
-    //   glTranslatef(0,0,3);
-
-    //   glBegin(GL_POLYGON);
-
-    //     glVertex3f(-2,0,-30);
-    //     glVertex3f(2,0,-30);
-
-    //     glVertex3f(-2,-2500,-30);
-    //     glVertex3f(2,-2500,-30);
-
-    //   glEnd();
-
-    // glPopMatrix();
-
-    // glPushMatrix();
-    // glColor3f(0.245, 0.245, 0.245);
-
-    //   glBegin(GL_POLYGON);
-
-    //     glVertex3f(100,-1000,-30);
-    //     glVertex3f(-100,-1000,-30);
-
-    //     glVertex3f(-100,-2700,-30);
-    //     glVertex3f(100,-2700,-30);
-
-    //   glEnd();
-
-    // glPopMatrix();
-
-    // }
-    // else
-    // {
-    //     for(int i=0,j=2200;i<=10;i++,j+=100){
-
-    //          glPushMatrix();
-    //          glTranslatef(-120,-j,0);
-    //          glPushMatrix();
-    //          {
-    //            glTranslatef(0,0,0);
-    //            glColor3f(.6,.6,.6);
-    //            glRotatef(90,1,0,0);
-    //            glutSolidCube(50);
-    //          }glPopMatrix();
-
-    //          glPushMatrix();
-    //         {
-    //            glTranslatef(0,0,20);
-    //            glColor3f(.6,.6,0);d
-    //            glutSolidCone(40,30,30,40);
-    //          }glPopMatrix();
-
-    //          glPopMatrix();
-    //         }
-
-    //    for(int i=0,j=2200;i<=10;i++,j+=100){
-    //         glPushMatrix();
-    //         glTranslatef(120,-j,0);
-    //         glPushMatrix();
-    //         {
-    //            glTranslatef(0,0,0);
-    //            glColor3f(.6,.6,.6);
-    //            glRotatef(90,1,0,0);
-    //            glutSolidCube(50);
-    //         }glPopMatrix();
-
-
-
-    //         glPushMatrix();
-    //         {
-    //            glTranslatef(0,0,20);
-    //            glColor3f(1,.6,0);
-    //           //glRotatef(90,1,0,0);
-    //           glutSolidCone(40,30,30,40);
-    //          }glPopMatrix();
-
-    //           glPopMatrix();
-    //    }
-
-    // glPushMatrix();
-    // glColor3f(1, 1, 1);
-
-    //   glTranslatef(0,0,3);
-
-    //   glBegin(GL_POLYGON);
-
-    //     glVertex3f(-2,-1800,-30);
-    //     glVertex3f(2,-1800,-30);
-
-    //     glVertex3f(-2,-4000,-30);
-    //     glVertex3f(2,-4000,-30);
-
-    //   glEnd();
-
-    // glPopMatrix();
-
-
-    // glPushMatrix();
-    // glColor3f(0.245, 0.245, 0.245);
-
-    //   glBegin(GL_POLYGON);
-
-    //     glVertex3f(100,-2000,-30);
-    //     glVertex3f(-100,-2000,-30);
-
-    //     glVertex3f(-100,-4000,-30);
-    //     glVertex3f(100,-4000,-30);
-
-    //   glEnd();
-
-    // glPopMatrix();
-
-    // glPushMatrix();
-    // glColor3f(1, 1, 1);
-
-    //   glTranslatef(0,0,3);
-
-    //   glBegin(GL_POLYGON);
-
-    //     glVertex3f(-2,0,-30);
-    //     glVertex3f(2,0,-30);
-
-    //     glVertex3f(-2,-1700,-30);
-    //     glVertex3f(2,-1700,-30);
-
-    //   glEnd();
-
-    // glPopMatrix();
-
-    // }
-
-    drawRoad();
-    drawRoadMiddle();
-
-    drawOBJ();
-    
-    //drawMainCar();
-
-    drawBackground();
-
-    drawHill();
+  drawHill();
 
 	//ADD this line in the end --- if you use double buffer (i.e. GL_DOUBLE)
 	glutSwapBuffers();
@@ -651,9 +372,15 @@ void animate(){
 void init(){
 	//codes for initialization
 
-  char path[] = "Car.obj";
+  //Load Tree
+  string path = "Objetos/Tree.obj";
+  string obj_name = "Tree";
+  load_obj(path, obj_name);
 
-  load_obj(path);
+  //Load Car
+  path = "Objetos/Car2.obj";
+  obj_name = "Car";
+  load_obj(path, obj_name);
 
   for(int i=0; i<= carro.size(); i++){
     printf("Tamanho carro: %d", i);
@@ -682,6 +409,11 @@ void specialKeyListener(int key, int x,int y){
 
 	switch(key){
 
+    case GLUT_KEY_F2:		//down arrow key
+			printf("Funcionei\n");
+      gluLookAt(0,Y,10,-30000,0,0,0,0,1);
+		break;
+
 		case GLUT_KEY_UP:		//down arrow key
 			
 			car-=10;
@@ -706,19 +438,23 @@ void specialKeyListener(int key, int x,int y){
 
 		case GLUT_KEY_LEFT:
 
-      leftRightMove+=5;
-      car-=5;
-      Y-=5;
-      sky-=5;
+      if(leftRightMove<15){
+        leftRightMove+=5;
+        car-=5;
+        Y-=5;
+        sky-=5;
+      }
 
 			break;
 		
     case GLUT_KEY_RIGHT:
 
-      leftRightMove-=5;
-      car-=5;
-      Y-=5;
-      sky-=5;
+      if(leftRightMove>-15){
+        leftRightMove-=5;
+        car-=5;
+        Y-=5;
+        sky-=5;
+      }
 			break;
 
 	}
@@ -731,7 +467,7 @@ int main(int argc, char **argv){
 	glutInitWindowPosition(0, 0);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);	//Depth, Double buffer, RGB color
 
-	glutCreateWindow("My OpenGL Program");
+	glutCreateWindow("Caio - Fomula 1");
 
   init();
 
