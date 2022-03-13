@@ -302,7 +302,7 @@ void init(){
   load_obj(path, obj_name);
 
   //Load Car
-  path = "Objetos/Car2.obj";
+  path = "Objetos/Car.obj";
   obj_name = "Car";
   load_obj(path, obj_name);
 
