@@ -17,11 +17,11 @@ using namespace std;
 #define TREE_TRUNK 0
 #define LEAFS 1
 
-
 double car=0;
 double X=10,Y=50,Z=10;
 double leftRightMove=0;
 double sky=-1000;
+double cloud_position=1200;
 
 struct car_meshs{
   objl::Mesh cur_mesh;
@@ -31,12 +31,17 @@ struct tree_meshs{
   objl::Mesh cur_mesh;
 };
 
+struct cloud_meshs{
+  objl::Mesh cur_mesh;
+};
+
 struct point{
 	double x,y,z;
 };
 
 vector<car_meshs> carro;
 vector<tree_meshs> arvore;
+vector<cloud_meshs> nuvem;
 
 void load_obj(string PathToOBJ, string OBJ_name){
 
@@ -69,18 +74,19 @@ void load_obj(string PathToOBJ, string OBJ_name){
 
     }
 
+    if(OBJ_name == "Cloud"){
+
+      cloud_meshs Mesh;
+      
+      for (int i = 0; i < Loader.LoadedMeshes.size(); i++){
+        Mesh.cur_mesh = Loader.LoadedMeshes[i];
+        nuvem.push_back(Mesh);
+      }
+
+    }
+
   }
 
-}
-
-void drawSquare(double a){
-  glColor3f(1.0,0.0,0.0);
-	glBegin(GL_QUADS);{
-  glVertex3f( a, a,0);
-  glVertex3f( a,-a,0);
-  glVertex3f(-a,-a,0);
-  glVertex3f(-a, a,0);
-	}glEnd();
 }
 
 void drawRoad(){
@@ -110,73 +116,15 @@ void drawRoadMiddle(){
 
     glBegin(GL_POLYGON);
 
-    glVertex3f(-2,0,-30);
-    glVertex3f(2,0,-30);
+    glVertex3f(-2,5000,-30);
+    glVertex3f(2,5000,-30);
 
-    glVertex3f(-2,-2500,-30);
-    glVertex3f(2,-2500,-30);
+    glVertex3f(-2,-5000,-30);
+    glVertex3f(2,-5000,-30);
 
     glEnd();
 
     glPopMatrix();
-}
-
-void drawMainCar(){
-    glPushMatrix();
-    cout<<car<<endl;
-
-    glTranslatef(leftRightMove,car,0);
-    glRotatef(90,0,0,1);
-
-    /*******lower part********/
-    glPushMatrix();
-    glColor3f(1,.8,3);
-    glScalef(2,1,.4);    
-    glutSolidCube(10);
-    glPopMatrix();
-
-    /******* upper part********/
-    glPushMatrix();
-    glTranslatef(0,0,3);
-    glColor3f(.67,.67,.67);   
-    glScalef(1,1,.6);
-    glutSolidCube(10);
-    glPopMatrix();
-
-    /******* front wheel left part********/
-    glPushMatrix();
-    glTranslatef(4,5,-2);
-    glColor3f(1,.3,8);   
-    glScalef(2,.7,1);
-    glutSolidSphere(2,100,100);
-    glPopMatrix();
-
-    /******* front wheel right part********/
-    glPushMatrix();
-    glTranslatef(-4,5,-2);
-    glColor3f(1,0,1);   
-    glScalef(1,.7,1);
-    glutSolidSphere(2,100,100);
-    glPopMatrix();
-
-    /******* behind wheel left part********/
-    glPushMatrix();
-    glTranslatef(4,-5,-2);
-    glColor3f(1,.6,8);   
-    glScalef(1,.7,1);
-    glutSolidSphere(2,100,100);
-    glPopMatrix();
-
-    /******* behind wheel right part********/
-    glPushMatrix();
-    glTranslatef(-4,-5,-2);
-    glColor3f(1,.3,8);   
-    glScalef(1,.7,1);
-    glutSolidSphere(2,100,100);
-    glPopMatrix();
-
-    glPopMatrix();
-
 }
 
 void drawBackground(){
@@ -188,60 +136,6 @@ void drawBackground(){
     glScalef(.003,2,1);
     glutSolidCube(1000);
 
-    glPopMatrix();
-
-}
-
-void drawHill(){
-
-    glPushMatrix();
-    glTranslatef(500,sky+30,0);
-    glRotatef(90,0,0,1);
-    glColor3f(0,0.9,0);
-    glutSolidCone(200,400,20,20);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(-500,sky+30,0);
-    glRotatef(90,0,0,1);
-    glColor3f(0,0.9,0.5);
-    glutSolidCone(200,400,20,20);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(-700,sky+30,0);
-    glRotatef(90,0,0,1);
-    glColor3f(0,0.9,0.5);
-    glutSolidCone(200,400,20,20);
-    glPopMatrix();
-
-}
-
-void drawClouds(){
-
-    glPushMatrix();
-
-    glBegin(GL_QUADS);
-    glVertex2f(500.0f, 700.0f); // top left
-    glVertex2f(1.0f, 1.0f); // top right 
-    glVertex2f(1.0f, -1.0f); // bottom right
-    glVertex2f(-1.0f, -1.0f); // bottom left
-    glEnd();
-
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(-500,sky+30,0);
-    glRotatef(90,0,0,1);
-    glColor3f(0,0.9,0.5);
-    glutSolidCone(200,400,20,20);
-    glPopMatrix();
-
-    glPushMatrix();
-    glTranslatef(-700,sky+30,0);
-    glRotatef(90,0,0,1);
-    glColor3f(0,0.9,0.5);
-    glutSolidCone(200,400,20,20);
     glPopMatrix();
 
 }
@@ -277,8 +171,6 @@ void drawCarOBJ(){
 void drawTreeOBJ(int x, int y){
 
   glPushMatrix();
- 
-  // Render a color-cube consisting of 6 quads with different colors
 
   glTranslatef(x,-y,0);
   glRotatef(90,1,0,0);
@@ -308,6 +200,38 @@ void drawTreeOBJ(int x, int y){
 
 }
 
+void drawCloudOBJ(){
+
+  if(cloud_position == -1200){
+    cloud_position = 1200;
+  }
+
+  glPushMatrix();
+
+  glTranslatef(cloud_position,sky+150,550);
+  glRotatef(90,0,1,0);
+
+  glBegin(GL_POLYGON);
+
+  glColor3f(1, 1, 1);
+
+  for (int i = 0; i < nuvem.size() ; i++){
+  
+    for (int j = 0; j < nuvem[i].cur_mesh.Vertices.size(); j++){
+      glVertex3f(nuvem[i].cur_mesh.Vertices[j].Position.X, nuvem[i].cur_mesh.Vertices[j].Position.Y, nuvem[i].cur_mesh.Vertices[j].Position.Z);
+      glNormal3f(nuvem[i].cur_mesh.Vertices[j].Normal.X, nuvem[i].cur_mesh.Vertices[j].Normal.Y, nuvem[i].cur_mesh.Vertices[j].Normal.Z);
+    }
+
+  }
+
+  glEnd();
+
+  glPopMatrix();
+
+  cloud_position-=5; 
+
+}
+
 void display(){
 
 	//clear the display
@@ -332,21 +256,21 @@ void display(){
 	//2. where is the camera looking?
 	//3. Which direction is the camera's UP direction?
 
-	gluLookAt(0,Y,10,	0,-30000,0,	0,0,1);
+  gluLookAt(0,Y,10,	0,-30000,0,	0,0,1);
+
+  car-=.5;
+  Y-=.5;
+  sky-=.5;
 
 	/****************************
 	/ Add your objects from here
 	****************************/
 	//add objects
-  car-=.5;
-  Y-=.5;
-  sky-=.5;
-
-  for(int i=0,j=0;i<=30;i++,j+=100){
+  for(int i=0,j=0;i<=45;i++,j+=100){
       drawTreeOBJ(-35, j);
   }
 
-  for(int i=0,j=0;i<=30;i++,j+=100){
+  for(int i=0,j=0;i<=45;i++,j+=100){
       drawTreeOBJ(35, j);
   }
 
@@ -357,7 +281,7 @@ void display(){
 
   drawBackground();
 
-  drawHill();
+  drawCloudOBJ();
 
 	//ADD this line in the end --- if you use double buffer (i.e. GL_DOUBLE)
 	glutSwapBuffers();
@@ -382,9 +306,10 @@ void init(){
   obj_name = "Car";
   load_obj(path, obj_name);
 
-  for(int i=0; i<= carro.size(); i++){
-    printf("Tamanho carro: %d", i);
-  }
+  //Load Cloud
+  path = "Objetos/Cloud.obj";
+  obj_name = "Cloud";
+  load_obj(path, obj_name);
 
 	//clear the screen
 	glClearColor(0,0,0,0);
@@ -411,7 +336,6 @@ void specialKeyListener(int key, int x,int y){
 
     case GLUT_KEY_F2:		//down arrow key
 			printf("Funcionei\n");
-      gluLookAt(0,Y,10,-30000,0,0,0,0,1);
 		break;
 
 		case GLUT_KEY_UP:		//down arrow key

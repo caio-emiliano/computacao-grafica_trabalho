@@ -1,3 +1,6 @@
-# Car-Driving-Game-opengl-
+# Driving Car Game: Fórmula 1 - Caio
 
-This is a simple car driving game created by only opengl libraray of c++.
+A simple car driving game created using opengl and OBJ_Loader libraries of c++.
+
+To RUN: g++ Game.cpp -lGL -lGLU -lglut
+        ./a.out
