@@ -23,6 +23,8 @@ double leftRightMove=0;
 double sky=-1000;
 double cloud_position=1200;
 
+int VIEW_MODE = 0;
+
 struct car_meshs{
   objl::Mesh cur_mesh;
 };
@@ -232,6 +234,25 @@ void drawCloudOBJ(){
 
 }
 
+void cameraPosition(){
+
+  //printf("View mode value inside camera position: %d\n", VIEW_MODE);
+
+  if(VIEW_MODE == 0){ //Vista em 3º pessoa
+    gluLookAt(leftRightMove,Y,10,	0,-30000,0,	0,0,1);
+  }
+  else if(VIEW_MODE == 1){ //Vista em 1º pessoa
+    double dif = car - Y;
+    gluLookAt(leftRightMove,Y+dif,10,	0,-30000,0,	0,0,1);
+  }
+  else if(VIEW_MODE == 2){ //Vista em 1º pessoa
+    double dif = car - Y + 45;
+    //printf("Dif: %f", dif);
+    gluLookAt(leftRightMove,Y-dif,20,	0,-40000,0,	0,0,1);
+  }
+
+}
+
 void display(){
 
 	//clear the display
@@ -256,7 +277,7 @@ void display(){
 	//2. where is the camera looking?
 	//3. Which direction is the camera's UP direction?
 
-  gluLookAt(0,Y,10,	0,-30000,0,	0,0,1);
+  cameraPosition();
 
   car-=.5;
   Y-=.5;
@@ -267,21 +288,21 @@ void display(){
 	****************************/
 	//add objects
   for(int i=0,j=0;i<=45;i++,j+=100){
-      drawTreeOBJ(-35, j);
+      drawTreeOBJ(-65, j);
   }
 
   for(int i=0,j=0;i<=45;i++,j+=100){
-      drawTreeOBJ(35, j);
+      drawTreeOBJ(65, j);
   }
+
+  drawBackground();
+
+  drawCloudOBJ();
 
   drawCarOBJ();
 
   drawRoad();
   drawRoadMiddle();
-
-  drawBackground();
-
-  drawCloudOBJ();
 
 	//ADD this line in the end --- if you use double buffer (i.e. GL_DOUBLE)
 	glutSwapBuffers();
@@ -336,6 +357,10 @@ void specialKeyListener(int key, int x,int y){
 
     case GLUT_KEY_F2:		//down arrow key
 			printf("Funcionei\n");
+      VIEW_MODE += 1;
+      if(VIEW_MODE > 2){
+        VIEW_MODE = 0;
+      }
 		break;
 
 		case GLUT_KEY_UP:		//down arrow key
