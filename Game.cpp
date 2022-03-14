@@ -1,29 +1,16 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<math.h>
 #include<iostream>
 #include <GL/glut.h>
 #include <vector>
 #include <string>
 using namespace std;
-#define pi (2*acos(0.0))
-
-// fStream - STD File I/O Library
-#include <fstream>
 
 // OBJ_Loader - .obj Loader
 #include "OBJ_Loader.h"
 
 #define TREE_TRUNK 0
 #define LEAFS 1
-
-double car=0;
-double X=10,Y=50,Z=10;
-double leftRightMove=0;
-double sky=-1000;
-double cloud_position=1200;
-
-int VIEW_MODE = 0;
 
 struct car_meshs{
   objl::Mesh cur_mesh;
@@ -37,13 +24,17 @@ struct cloud_meshs{
   objl::Mesh cur_mesh;
 };
 
-struct point{
-	double x,y,z;
-};
-
 vector<car_meshs> carro;
 vector<tree_meshs> arvore;
 vector<cloud_meshs> nuvem;
+
+double car=0;
+double sky=-1000;
+double cloud_position=1200;
+double X=10,Y=50,Z=10;
+double leftRightMove=0;
+
+int VIEW_MODE = 0;
 
 void load_obj(string PathToOBJ, string OBJ_name){
 
@@ -144,9 +135,9 @@ void drawBackground(){
 
 void drawCarOBJ(){
 
+  //Function for draw OBJ Car
+
   glPushMatrix();
- 
-  // Render a color-cube consisting of 6 quads with different colors
 
   glTranslatef(leftRightMove,car,0);
   glRotatef(90,1,0,0);
@@ -155,7 +146,7 @@ void drawCarOBJ(){
 
   glColor3f(0, 0, 0);
 
-  for (int i = 0; i < carro.size() ; i++){
+  for (int i = 0; i < carro.size() ; i++){ //Iterating through object meshes
   
     for (int j = 0; j < carro[i].cur_mesh.Vertices.size(); j++){
       glVertex3f(carro[i].cur_mesh.Vertices[j].Position.X, carro[i].cur_mesh.Vertices[j].Position.Y, carro[i].cur_mesh.Vertices[j].Position.Z);
@@ -172,6 +163,8 @@ void drawCarOBJ(){
 
 void drawTreeOBJ(int x, int y){
 
+  //Function for draw OBJ Tree
+
   glPushMatrix();
 
   glTranslatef(x,-y,0);
@@ -179,9 +172,9 @@ void drawTreeOBJ(int x, int y){
 
   glBegin(GL_POLYGON);
 
-  for (int i = 0; i < arvore.size() ; i++){
+  for (int i = 0; i < arvore.size() ; i++){ //Iterating through object meshes
 
-    //Colorindo as partes da árvore
+    //Coloring all tree parts
     if(i == LEAFS){
       glColor3f(34.0 / 255, 139.0 / 255 ,34.0 / 255); //Green RGB Color
     }
@@ -204,6 +197,8 @@ void drawTreeOBJ(int x, int y){
 
 void drawCloudOBJ(){
 
+  //Function for draw OBJ Cloud
+
   if(cloud_position == -1200){
     cloud_position = 1200;
   }
@@ -217,7 +212,7 @@ void drawCloudOBJ(){
 
   glColor3f(1, 1, 1);
 
-  for (int i = 0; i < nuvem.size() ; i++){
+  for (int i = 0; i < nuvem.size() ; i++){ //Iterating through object meshes
   
     for (int j = 0; j < nuvem[i].cur_mesh.Vertices.size(); j++){
       glVertex3f(nuvem[i].cur_mesh.Vertices[j].Position.X, nuvem[i].cur_mesh.Vertices[j].Position.Y, nuvem[i].cur_mesh.Vertices[j].Position.Z);
@@ -236,18 +231,15 @@ void drawCloudOBJ(){
 
 void cameraPosition(){
 
-  //printf("View mode value inside camera position: %d\n", VIEW_MODE);
-
-  if(VIEW_MODE == 0){ //Vista em 3º pessoa
+  if(VIEW_MODE == 0){ //3rd person view
     gluLookAt(leftRightMove,Y,10,	0,-30000,0,	0,0,1);
   }
-  else if(VIEW_MODE == 1){ //Vista em 1º pessoa
+  else if(VIEW_MODE == 1){ //1st person view
     double dif = car - Y;
     gluLookAt(leftRightMove,Y+dif,10,	0,-30000,0,	0,0,1);
   }
-  else if(VIEW_MODE == 2){ //Vista em 1º pessoa
+  else if(VIEW_MODE == 2){ //Up view
     double dif = car - Y + 45;
-    //printf("Dif: %f", dif);
     gluLookAt(leftRightMove,Y-dif,20,	0,-40000,0,	0,0,1);
   }
 
@@ -257,11 +249,11 @@ void display(){
 
 	//clear the display
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(.345, 0.4, 0,0);	//color black
+	glClearColor(.345, 0.4, 0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	/********************
-	/ set-up camera here
+	/ set-up camera
 	********************/
 	//load the correct matrix -- MODEL-VIEW matrix
 	glMatrixMode(GL_MODELVIEW);
@@ -269,24 +261,17 @@ void display(){
 	//initialize the matrix
 	glLoadIdentity();
 
-	//again select MODEL-VIEW
-	glMatrixMode(GL_MODELVIEW);
-
-  //now give three info
-	//1. where is the camera (viewer)?
-	//2. where is the camera looking?
-	//3. Which direction is the camera's UP direction?
-
   cameraPosition();
 
+  //Moving the scenery so it doesn't look static
   car-=.5;
   Y-=.5;
   sky-=.5;
 
 	/****************************
-	/ Add your objects from here
+	/ Adding objects
 	****************************/
-	//add objects
+
   for(int i=0,j=0;i<=45;i++,j+=100){
       drawTreeOBJ(-65, j);
   }
@@ -304,18 +289,16 @@ void display(){
   drawRoad();
   drawRoadMiddle();
 
-	//ADD this line in the end --- if you use double buffer (i.e. GL_DOUBLE)
 	glutSwapBuffers();
 
 }
 
 void animate(){
-	//codes for any changes in Models, Camera
 	glutPostRedisplay();
 }
 
 void init(){
-	//codes for initialization
+	//Initialization
 
   //Load Tree
   string path = "Objetos/Tree.obj";
@@ -346,8 +329,6 @@ void init(){
 
 	//give PERSPECTIVE parameters
 	gluPerspective(80,	1,	1,	30000.0);
-	//field of view in the Y (vertically)
-	//aspect ratio that determines the field of view in the X direction (horizontally)
 
 }
 
@@ -355,28 +336,23 @@ void specialKeyListener(int key, int x,int y){
 
 	switch(key){
 
-    case GLUT_KEY_F2:		//down arrow key
-			printf("Funcionei\n");
+    case GLUT_KEY_F2: //Change camera position
       VIEW_MODE += 1;
       if(VIEW_MODE > 2){
         VIEW_MODE = 0;
       }
 		break;
 
-		case GLUT_KEY_UP:		//down arrow key
+		case GLUT_KEY_UP:
 			
 			car-=10;
 			Y-=10;
 			X-=5;
       sky-=10;
-			
-      if(Y==-10000){
-        Y=50;car=0;sky=-1000;
-		  }
 
 			break;
 		
-    case GLUT_KEY_DOWN:		// up arrow key
+    case GLUT_KEY_DOWN:	
 			
 			car+=5;
 			Y+=5;
@@ -387,8 +363,8 @@ void specialKeyListener(int key, int x,int y){
 
 		case GLUT_KEY_LEFT:
 
-      if(leftRightMove<15){
-        leftRightMove+=5;
+      if(leftRightMove<35){
+        leftRightMove+=2;
         car-=5;
         Y-=5;
         sky-=5;
@@ -398,8 +374,8 @@ void specialKeyListener(int key, int x,int y){
 		
     case GLUT_KEY_RIGHT:
 
-      if(leftRightMove>-15){
-        leftRightMove-=5;
+      if(leftRightMove>-35){
+        leftRightMove-=2;
         car-=5;
         Y-=5;
         sky-=5;
@@ -420,7 +396,7 @@ int main(int argc, char **argv){
 
   init();
 
-  glEnable(GL_DEPTH_TEST);	//enable Depth Testing
+  glEnable(GL_DEPTH_TEST);
 
 	glutDisplayFunc(display);	//display callback function
 	glutIdleFunc(animate);		//what you want to do in the idle time (when no drawing is occuring)
