@@ -30,8 +30,10 @@ vector<cloud_meshs> nuvem;
 
 double car=0;
 double sky=-1000;
+
 double cloud_position=1200;
 double X=10,Y=50,Z=10;
+
 double leftRightMove=0;
 
 int VIEW_MODE = 0;
@@ -388,7 +390,7 @@ void specialKeyListener(int key, int x,int y){
 
 int main(int argc, char **argv){
 	glutInit(&argc,argv);
-	glutInitWindowSize(500, 900);
+	glutInitWindowSize(700, 900);
 	glutInitWindowPosition(0, 0);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);	//Depth, Double buffer, RGB color
 
